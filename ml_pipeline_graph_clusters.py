@@ -123,7 +123,12 @@ class AddGraphClusterMembership(Operation):
                 gene.add_evidence(name="graph_cluster_"+cluster_number, value=1, origin_protein=gene_id)
 
 class PlotScoresHist(Operation):
-    
+    '''
+    Creates a histogram of the machine learning scores for the test data. Allows the user to evaluate if the
+    classifier is producing a distribution of scores given the known biology of the disease they are studying.
+    For example what proportion of all genes are likely to contribute to causing that disease vs the number the
+    classifier is predicting.
+    '''
     def __init__(self, name="PlotScoresHist"):
         Operation.__init__(self, name)
     
@@ -360,26 +365,25 @@ def call_bigclam(graph_fname, n_clusters):
     return output_filename
 
 def reformat_communities(in_fname, out_fname):
-    
-    #in_fname = "../cmtyvv.txt"
-    #out_fname = "bigclam_reformatted_communities.txt"
-    
+    '''Reformats the communities file that comes out of bigclam'''
     out_lines = []
     for i, line in enumerate(open(in_fname, "r")):
         if line.startswith("#"):
             continue
         for node_id in line.rstrip().split():
-            #print node_id
             out_lines.append(node_id+"\t"+str(i)+"\n")
     
     out_file = open(out_fname,"w")
     for line in out_lines:
-        #print line
         out_file.write(line)
 
 if __name__ == '__main__':
     '''
     TODO: check for -h or --help args and print options
+    TODO: output data has to go into a timestamped folder, will have to move calls out of pipeline into pipeline or call timestamp function manually then inject into biosession
+    TODO: handle clever network fix for decompressing graph, check md5sum of output graph from network package file
+    TODO: more user friendly options for running the pipeline
+    TODO: select for the user the optimal number of network clusters based on machine learning performance
     '''
     graph_fname="/mallow/data/2year/mito_graph/v10_raw_string_downloads/no_scores_non_textmining_edges_9606.protein.links.detailed.v10.txt"
     for number_of_clusters in [10, 50, 200, 300, 400, 500, 1000, 3000, 5000, 7000, 9000]:
