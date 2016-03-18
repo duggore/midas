@@ -1,5 +1,5 @@
 # MIDAS
-**MI**tochondrial **D**isease **A**ssociation **S**oftware - *Using interaction network topology to diagnose genetic diseases in patient genomes.*
+**MI**tochondrial **D**isease **A**ssociation **S**oftware - *Using machine learning on interaction network topology to diagnose genetic diseases in patient genomes.*
 
 # Abstract
 The genetic diagnosis of mitochondrial disease patients by exome sequencing has a low success rate of ~30%. We considered whether it would be possible to make use of interaction network data  describing functional and physical interactions between proteins to identify from a candidate gene proximate to known mitochondrial disease genes and therefore highlight it as potentially being the pathogenic gene in that patient. 
