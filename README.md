@@ -1,5 +1,5 @@
-# midas
-============
+# MIDAS
+**MI**tochondrial **D**isease **A**ssociation **S**oftware - *Using interaction network topology to diagnose genetic diseases in patient genomes.*
 
 # Abstract
 The genetic diagnosis of mitochondrial disease patients by exome sequencing has a low success rate of ~30%. We considered whether it would be possible to make use of interaction network data  describing functional and physical interactions between proteins to identify from a candidate gene proximate to known mitochondrial disease genes and therefore highlight it as potentially being the pathogenic gene in that patient. 
@@ -15,7 +15,8 @@ Currently only supports STRING but user can filter the graph based on edge score
 The training data is a list of IDs, the ids must be ENSP ids to match the STRING network ids, the "ENSP" must be removed from the begining of ids to make them numerical to allow for indexing nodes in the network as integers (a limitation of BIGCLAM community detection algorithm)
 ## 3. Discover the best number of network communities to use
 Machine learning performance is affected by partitioning the network into a different number of communities although this variation is minimal beyond a small number of communities suggesting that machine learning performance is not an artifact of overfitting.
-## 4. 
+## 4. Evaluate the results
+The pipeline will create folders of the form `string_N_communities` where `N` is the number of communities tested for the machine learning process. These folders contain the plots and machine learning cross validation scores for the user to evaluate and each folder contains the machine learning score predictions for all test data genes in the file `class_prediction_scores_rand_forest.txt` (assuming the default random forest classifier was used). The evaluation of results will be improved in the coming refactor.
 
 # Usage:
 Currently due to some glue code in bash for the example mitochondrial disease case simply run
