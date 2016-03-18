@@ -350,7 +350,7 @@ def call_bigclam(graph_fname, n_clusters):
     command_list = ["bigclam", "-i:"+graph_fname, "-c:"+str(n_clusters), "-o:"+output_prefix, "-nt:8"]
     cmd_string = subprocess.list2cmdline(command_list)
      
-    return_value = subprocess.call(command_list, stdout=png_file)
+    return_value = subprocess.call(command_list)#, stdout=png_file)
 
     if return_value !=0:
         output_string = subprocess.check_output(command_list)
