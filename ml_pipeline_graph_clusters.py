@@ -8,6 +8,7 @@ check_dependencies()
 import matplotlib.pyplot as plt
 import numpy as np
 import collections
+import subprocess
 import random
 import sys
 import os
@@ -303,14 +304,14 @@ class GraphClusterPipeline(Pipeline):
         self.add_resource("biosession", BioSession("ML_session") )
         self.add_resource("random_seed", 0)
         random.seed(self.random_seed)
-        #self.add_resource("communities_filename", "/mallow/data/2year/mito_graph/midas_input_data/edge_thresholded_human_string_graphs/barabasi_edges/bigclam_reformatted_communities.txt")
-        #self.add_resource("communities_filename", "/mallow/data/2year/mito_graph/midas_input_data/edge_thresholded_human_string_graphs/barabasi_edges/bigclam_reformatted_10000_communities.txt")
-        #self.add_resource("communities_filename", "/mallow/data/2year/mito_graph/midas_input_data/edge_thresholded_human_string_graphs/all_edges/0.0_threshold/string_10000_bigclam_reformatted_communities.txt")
         
+        # Was used when running MIDAS on Barabasi's network which needed NCBI ids not ENSP ids
         #self.add_resource("mito_disease_genes_filename", "../mito_disease_genes_as_ncbi_ids_for_barabasi.txt")
-        #self.add_resource("mito_disease_genes_filename", "/net/zeta/zeta/home/op251/Documents/3year/clustering_graph_ml/biosuite_version/data/omim_mito_disease_genes_ids_cropped.txt")
-        #self.add_resource("mito_disease_genes_filename", "/net/zeta/zeta/home/op251/Documents/2year/midas_project/workspace/pre_run_data_processing/wash_u/wash_u_extras_ensps.txt")
-        self.add_resource("mito_disease_genes_filename", "/home/op251/training_positives_as_ensps.txt")
+        
+        # The Washington University mitochondrial disease genes list
+        #self.add_resource("mito_disease_genes_filename", "/wash_u/wash_u_extras_ensps.txt")
+        
+        self.add_resource("mito_disease_genes_filename", "resources/training_data/training_positives/impi_training_positive/training_positives_as_ensps.txt")
         ##################################################
         #Add operations to the pipeline
         ##################################################
@@ -337,16 +338,65 @@ class GraphClusterPipeline(Pipeline):
         return self.pwd+"/results/"+self.biosession.timestamp+end_string
 
 
+
+
+
+
+def call_bigclam(self, graph_fname, n_clusters):
+    #png_filename = self.pipeline.output_dir+"images/"+plot_name+".png"
+
+    print "Running BIGCLAM"
+    output_prefix = str(n_clusters)+"_"
+    command_list = ["bigclam", "-i:"+graph_fname, "-c:"+str(n_clusters), "-o:"+output_prefix, "-nt:8"]
+    cmd_string = subprocess.list2cmdline(command_list)
+     
+    return_value = subprocess.call(command_list, stdout=png_file)
+
+    if return_value !=0:
+        output_string = subprocess.check_output(command_list)
+        raise Exception("call_bigclam() failed with output: "+output_string) # command:"+cmd_string)
+    
+    output_filename = output_prefix+"cmtyvv.txt"
+    return output_filename
+
+def reformat_communities(in_fname, out_fname):
+    
+    #in_fname = "../cmtyvv.txt"
+    #out_fname = "bigclam_reformatted_communities.txt"
+    
+    out_lines = []
+    for i, line in enumerate(open(in_fname, "r")):
+        if line.startswith("#"):
+            continue
+        for node_id in line.rstrip().split():
+            #print node_id
+            out_lines.append(node_id+"\t"+str(i)+"\n")
+    
+    out_file = open(out_fname,"w")
+    for line in out_lines:
+        #print line
+        out_file.write(line)
+
 if __name__ == '__main__':
     '''
     TODO: check for -h or --help args and print options
     '''
-    
-    pipeline = GraphClusterPipeline()
-    
-    pipeline.run_pipeline()
-    
-    
+    graph_fname="/mallow/data/2year/mito_graph/v10_raw_string_downloads/no_scores_non_textmining_edges_9606.protein.links.detailed.v10.txt"
+    for number_of_clusters in [10, 50, 200, 300, 400, 500, 1000, 3000, 5000, 7000, 9000]:
+        
+        bigclam_output_filename = call_bigclam(graph_fname, number_of_clusters)
+        
+        data_folder = "/mallow/data/2year/mito_graph/v10_raw_string_downloads/clustering/"
+        communities_fname = data_folder+"string_v10_no_textmining_reformatted_"+str(number_of_clusters)+"_communities.txt"
+        
+        reformat_communities(bigclam_output_filename, communities_fname)
+        
+        print "Starting Machine learning stage"
+        pipeline = GraphClusterPipeline()
+        pipeline.add_resource("communities_filename", communities_fname)
+        pipeline.add_resource("run_desc", "string_"+str(number_of_clusters)+"_communities/")
+        pipeline.run_pipeline()
+
     #scores = pipeline.ml_scores_list
     #print "N genes:",len(scores)
     #print "N above 0.5",len([x for x in scores if x > 0.5])
