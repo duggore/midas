@@ -342,7 +342,7 @@ class GraphClusterPipeline(Pipeline):
 
 
 
-def call_bigclam(self, graph_fname, n_clusters):
+def call_bigclam(graph_fname, n_clusters):
     #png_filename = self.pipeline.output_dir+"images/"+plot_name+".png"
 
     print "Running BIGCLAM"
