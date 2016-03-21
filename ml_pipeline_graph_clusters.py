@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import collections
 import subprocess
+import tarfile
 import random
 import sys
 import os
@@ -333,7 +334,6 @@ class GraphClusterPipeline(Pipeline):
         
 
     def get_output_dir(self):
-        
         '''
         Appends _TESTING_RUN to output folder path if pipeline is running in testing more
         so that the user can see at a glance whether a folder is testing or a real run.
@@ -377,6 +377,19 @@ def reformat_communities(in_fname, out_fname):
     for line in out_lines:
         out_file.write(line)
 
+def extract_graph_archive(graph_folder, graph_archive_fname):
+    '''
+    This is the temp quick fix to decompressing the graph archive which has to
+    be compressed to fit on github.
+    
+    Code is in progress to check hashes etc. to prevent decompressing when the
+    file is already decompressed but this is fine for now.
+    '''
+    
+    tar = tarfile.open(graph_folder+graph_archive_fname)
+    tar.extractall(path=graph_folder)
+    tar.close()
+
 if __name__ == '__main__':
     '''
     TODO: check for -h or --help args and print options
@@ -385,10 +398,16 @@ if __name__ == '__main__':
     TODO: more user friendly options for running the pipeline
     TODO: select for the user the optimal number of network clusters based on machine learning performance
     '''
-    graph_fname="/mallow/data/2year/mito_graph/v10_raw_string_downloads/no_scores_non_textmining_edges_9606.protein.links.detailed.v10.txt"
+    
+    #TODO: This is a temp solution see extract_graph_archive() function body for more info
+    graph_folder = "resources/networks/string/"
+    graph_fname = "compressed_no_scores_non_textmining_edges_9606.protein.links.detailed.v10.txt"
+    graph_archive_fname = graph_fname+".tar.gz"
+    extract_graph_archive(graph_folder, graph_archive_fname)
+    
     for number_of_clusters in [10, 50, 200, 300, 400, 500, 1000, 3000, 5000, 7000, 9000]:
         
-        bigclam_output_filename = call_bigclam(graph_fname, number_of_clusters)
+        bigclam_output_filename = call_bigclam(graph_folder+graph_fname, number_of_clusters)
         
         data_folder = "/mallow/data/2year/mito_graph/v10_raw_string_downloads/clustering/"
         communities_fname = data_folder+"string_v10_no_textmining_reformatted_"+str(number_of_clusters)+"_communities.txt"
