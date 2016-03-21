@@ -19,9 +19,26 @@ Machine learning performance is affected by partitioning the network into a diff
 The pipeline will create folders of the form `string_N_communities` where `N` is the number of communities tested for the machine learning process. These folders contain the plots and machine learning cross validation scores for the user to evaluate and each folder contains the machine learning score predictions for all test data genes in the file `class_prediction_scores_rand_forest.txt` (assuming the default random forest classifier was used). The evaluation of results will be improved in the coming refactor.
 
 # Usage:
-Currently due to some glue code in bash for the example mitochondrial disease case simply run
-`$ ./run_all_cluster_numbers.sh`
+For the example mitochondrial disease case simply run
+`$ python ml_main.py`
 
-To change training data or network these variables must be changed manually in `run_for_n_clusters.sh` and `ml_pipeline_graph_clusters.py` respectively.
+To change training data or network these variables must be changed manually in `ml_main.py`.
 
 A refactor is in process which will make the running process more userfriendly.
+
+# Dependencies:
+## Python
+MIDAS was developed on python 2.7
+
+MIDAS requires biosuite to run https://github.com/OliverPalmer/biosuite
+
+scipy
+
+numpy
+
+sklearn
+
+matplotlib
+
+## Other
+BIGCLAM - Included with the SNAP graph library, download from https://snap.stanford.edu/snap/download.html make the library and the BIGCLAM binary is in the `examples/bigclam` folder. The BIGCLAM binary must be on the path where python can find it for MIDAS to work.
