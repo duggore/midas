@@ -15,10 +15,8 @@ import sys
 import os
 import re
 
-from biosuite import BioSession, mitominer, parsers
-from biosuite.clustering import GeneBasedClustering
-from biosuite.results_handler import ResultsHandler
-from biosuite.machine_learning import RandomizedPCAPreProcessor, MLController, Classifier
+from biosuite import BioSession
+from biosuite.machine_learning import MLController, Classifier
 from biosuite.helper_functions import inform, warn
 from biosuite.pipeline import Pipeline, Operation
 from biosuite.protein import Protein
@@ -26,7 +24,6 @@ from biosuite.protein import Protein
 from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.grid_search import GridSearchCV
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -116,7 +113,6 @@ class AddGraphClusterMembership(Operation):
     def __call__(self):
         print "Adding GraphClusterMembership data from SNAP graph cluster algorithm."
         clusters_filename = self.pipeline.communities_filename
-        #self.pipeline.biosession.add_data(clusters_filename, parsers.TMHMMParser, "graph_cluster")
         for line in open(clusters_filename, "r"):
             gene_id, cluster_number = line.rstrip().split()
             gene = self.pipeline.biosession.get_protein(gene_id)
@@ -145,7 +141,7 @@ class PlotScoresHist(Operation):
         hist, bins = np.histogram(scores, bins=50)
         width = 0.7 * (bins[1] - bins[0])
         center = (bins[:-1] + bins[1:]) / 2
-        #flc required because of previous plots by ml_classifier
+        #clf required because of previous plots by ml_classifier
         plt.clf()
         plt.bar(center, hist, align='center', width=width)
         title_string = "Mito disease causing prediction scores\nbased on network neighbourhoods"
@@ -341,10 +337,6 @@ class GraphClusterPipeline(Pipeline):
         
         end_string = "_TESTING_RUN/" if self.testing else "/"
         return self.pwd+"/results/"+self.biosession.timestamp+end_string
-
-
-
-
 
 
 def call_bigclam(graph_fname, n_clusters):
