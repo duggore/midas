@@ -138,8 +138,8 @@ class PlotScoresHist(Operation):
                 scores.append(score)
             except KeyError:
                 pass
-            except AttributeError:
-                warn("In PlotScoresHist classifier appears to not have score capability (raised Attribute area) skipping plot")
+            except TypeError:
+                warn("In PlotScoresHist classifier appears to not have score capability (call to ml_controller.get_score() raised TypeError) skipping plot")
                 return
         hist, bins = np.histogram(scores, bins=50)
         width = 0.7 * (bins[1] - bins[0])
