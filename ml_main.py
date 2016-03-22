@@ -17,7 +17,7 @@ import re
 
 from biosuite import BioSession
 from biosuite.machine_learning import MLController, Classifier
-from biosuite.helper_functions import inform, warn
+from biosuite.helper_functions import inform, warn, get_date_time
 from biosuite.pipeline import Pipeline, Operation
 from biosuite.protein import Protein
 
@@ -397,6 +397,8 @@ if __name__ == '__main__':
     graph_archive_fname = graph_fname+".tar.gz"
     extract_graph_archive(graph_folder, graph_archive_fname)
     
+    time_stamp = get_date_time()
+    
     for number_of_clusters in [10, 50, 200, 300, 400, 500, 1000, 3000, 5000, 7000, 9000]:
         
         bigclam_output_filename = call_bigclam(graph_folder+graph_fname, number_of_clusters)
@@ -409,7 +411,7 @@ if __name__ == '__main__':
         print "Starting Machine learning stage"
         pipeline = GraphClusterPipeline()
         pipeline.add_resource("communities_filename", communities_fname)
-        pipeline.add_resource("run_desc", "string_"+str(number_of_clusters)+"_communities/")
+        pipeline.add_resource("run_desc", "results/"+time_stamp+"/string_"+str(number_of_clusters)+"_communities/")
         pipeline.run_pipeline()
 
     #scores = pipeline.ml_scores_list
