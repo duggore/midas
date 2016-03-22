@@ -138,6 +138,9 @@ class PlotScoresHist(Operation):
                 scores.append(score)
             except KeyError:
                 pass
+            except AttributeError:
+                warn("In PlotScoresHist classifier appears to not have score capability (raised Attribute area) skipping plot")
+                return
         hist, bins = np.histogram(scores, bins=50)
         width = 0.7 * (bins[1] - bins[0])
         center = (bins[:-1] + bins[1:]) / 2
@@ -377,15 +380,15 @@ def extract_graph_archive(graph_folder, graph_archive_fname):
     Code is in progress to check hashes etc. to prevent decompressing when the
     file is already decompressed but this is fine for now.
     '''
-    
+    print "Extracting compressed network file:",graph_archive_fname,"...",
     tar = tarfile.open(graph_folder+graph_archive_fname)
     tar.extractall(path=graph_folder)
     tar.close()
+    print "complete"
 
 if __name__ == '__main__':
     '''
     TODO: check for -h or --help args and print options
-    TODO: output data has to go into a timestamped folder, will have to move calls out of pipeline into pipeline or call timestamp function manually then inject into biosession
     TODO: handle clever network fix for decompressing graph, check md5sum of output graph from network package file
     TODO: more user friendly options for running the pipeline
     TODO: select for the user the optimal number of network clusters based on machine learning performance
