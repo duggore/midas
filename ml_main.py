@@ -393,7 +393,7 @@ if __name__ == '__main__':
     
     #TODO: This is a temp solution see extract_graph_archive() function body for more info
     graph_folder = "resources/networks/string/"
-    graph_fname = "compressed_no_scores_non_textmining_edges_9606.protein.links.detailed.v10.txt"
+    graph_fname = "no_scores_non_textmining_edges_9606.protein.links.detailed.v10.txt"
     graph_archive_fname = graph_fname+".tar.gz"
     extract_graph_archive(graph_folder, graph_archive_fname)
     
