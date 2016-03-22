@@ -348,7 +348,7 @@ def call_bigclam(graph_fname, time_stamp, n_clusters):
 
     print "Running BIGCLAM"
     #TODO: This is a bit messy refactor when possible
-    output_prefix = "results/"+time_stamp+"string_"+str(n_clusters)+"_communities"+str(n_clusters)+"_"
+    output_prefix = "results/"+time_stamp+"/string_"+str(n_clusters)+"_communities/"+str(n_clusters)+"_"
     command_list = ["bigclam", "-i:"+graph_fname, "-c:"+str(n_clusters), "-o:"+output_prefix, "-nt:8"]
     cmd_string = subprocess.list2cmdline(command_list)
     
@@ -406,7 +406,7 @@ if __name__ == '__main__':
     
     for number_of_clusters in [10, 50, 200, 300, 400, 500, 1000, 3000, 5000, 7000, 9000]:
         
-        bigclam_output_filename = call_bigclam(graph_folder+graph_fname, number_of_clusters)
+        bigclam_output_filename = call_bigclam(graph_folder+graph_fname, time_stamp, number_of_clusters)
         
         data_folder = "/mallow/data/2year/mito_graph/v10_raw_string_downloads/clustering/"
         communities_fname = data_folder+"string_v10_no_textmining_reformatted_"+str(number_of_clusters)+"_communities.txt"
