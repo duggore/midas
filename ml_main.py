@@ -151,9 +151,10 @@ class PlotScoresHist(Operation):
         plt.title(title_string)
         plt.xlabel("Score")
         plt.ylabel("Number of Genes")
-        filename = re.sub(" ","_",title_string.lower())+".pdf"
+        filename = re.sub("\n", "_", re.sub(" ","_",title_string.lower()))+".pdf"
         plt.savefig(filename)
         #self.pipeline.add_resource("ml_scores_list", scores)
+        pass
 
 class RunMachineLearning(Operation):
     
@@ -342,14 +343,15 @@ class GraphClusterPipeline(Pipeline):
         return self.pwd+"/results/"+self.biosession.timestamp+end_string
 
 
-def call_bigclam(graph_fname, n_clusters):
+def call_bigclam(graph_fname, time_stamp, n_clusters):
     #png_filename = self.pipeline.output_dir+"images/"+plot_name+".png"
 
     print "Running BIGCLAM"
-    output_prefix = str(n_clusters)+"_"
+    #TODO: This is a bit messy refactor when possible
+    output_prefix = "results/"+time_stamp+"string_"+str(n_clusters)+"_communities"+str(n_clusters)+"_"
     command_list = ["bigclam", "-i:"+graph_fname, "-c:"+str(n_clusters), "-o:"+output_prefix, "-nt:8"]
     cmd_string = subprocess.list2cmdline(command_list)
-     
+    
     return_value = subprocess.call(command_list)#, stdout=png_file)
 
     if return_value !=0:
