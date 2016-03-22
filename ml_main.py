@@ -56,7 +56,7 @@ class AddTrainingPositiveStatus(Operation):
     def __call__(self):
         print "Adding training status to training positive genes."
         training_positive_genes = []
-        for line in open(self.pipeline.mito_disease_genes_filename):
+        for line in open(self.pipeline.train_positives_fname):
             gene_name = line.rstrip()
             try:
                 gene = self.pipeline.biosession.get_protein(gene_name, silent=True)
@@ -312,12 +312,12 @@ class GraphClusterPipeline(Pipeline):
         random.seed(self.random_seed)
         
         # Was used when running MIDAS on Barabasi's network which needed NCBI ids not ENSP ids
-        #self.add_resource("mito_disease_genes_filename", "../mito_disease_genes_as_ncbi_ids_for_barabasi.txt")
+        #self.add_resource("train_positives_fname", "../mito_disease_genes_as_ncbi_ids_for_barabasi.txt")
         
         # The Washington University mitochondrial disease genes list
-        #self.add_resource("mito_disease_genes_filename", "/wash_u/wash_u_extras_ensps.txt")
+        #self.add_resource("train_positives_fname", "/wash_u/wash_u_extras_ensps.txt")
         
-        self.add_resource("mito_disease_genes_filename", "resources/training_data/training_positives/impi_training_positive/training_positives_as_ensps.txt")
+        self.add_resource("train_positives_fname", "resources/training_data/training_positives/impi_training_positive/training_positives_as_ensps.txt")
         ##################################################
         #Add operations to the pipeline
         ##################################################
@@ -342,7 +342,6 @@ class GraphClusterPipeline(Pipeline):
         end_string = "_TESTING_RUN/" if self.testing else "/"
         return self.pwd+"/results/"+self.biosession.timestamp+end_string
 
-
 def move_file(from_filename, to_filename):
     command_list = ["mv", from_filename, to_filename]
     cmd_string = subprocess.list2cmdline(command_list)
@@ -352,7 +351,6 @@ def move_file(from_filename, to_filename):
     if return_value !=0:
         output_string = subprocess.check_output(command_list)
         raise Exception("move_file() failed with output: "+output_string)
-
 
 def call_bigclam(graph_fname, time_stamp, n_clusters):
     #png_filename = self.pipeline.output_dir+"images/"+plot_name+".png"
@@ -377,6 +375,9 @@ def call_bigclam(graph_fname, time_stamp, n_clusters):
     #Move the file from the default output name to the name with the number of clusters to prevent overwriting
     output_filename = output_folder+output_prefix+"cmtyvv.txt"
     move_file("cmtyvv.txt", output_filename)
+    
+    #remove this file which is output by BIGCLAM but unused by us
+    subprocess.call(["rm", "graph.gexf"])
     
     return output_filename
 
@@ -409,10 +410,16 @@ def extract_graph_archive(graph_folder, graph_archive_fname):
 
 if __name__ == '__main__':
     '''
+    
+    TODO: Plan for todo: move calling of bigclam and reformat_communities into pipeline with their resources added as resources to the pipeline
+          update the resources that change i.e. number of clusters and have run_desc updated for each call of run_pipeline()
+    
     TODO: check for -h or --help args and print options
     TODO: handle clever network fix for decompressing graph, check md5sum of output graph from network package file
     TODO: more user friendly options for running the pipeline
-    TODO: select for the user the optimal number of network clusters based on machine learning performance
+    TODO: select for the user the optimal number of network communities based on machine learning performance
+    TODO: put pdf plot into correct results folder, perhaps add results folder path as resource
+    TODO: create ROC AUC vs number of communities
     '''
     
     #TODO: This is a temp solution see extract_graph_archive() function body for more info
