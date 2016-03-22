@@ -343,13 +343,24 @@ class GraphClusterPipeline(Pipeline):
         return self.pwd+"/results/"+self.biosession.timestamp+end_string
 
 
+def move_file(from_filename, to_filename):
+    command_list = ["mv", from_filename, to_filename]
+    cmd_string = subprocess.list2cmdline(command_list)
+    
+    return_value = subprocess.call(command_list)#, stdout=png_file)
+
+    if return_value !=0:
+        output_string = subprocess.check_output(command_list)
+        raise Exception("move_file() failed with output: "+output_string) # command:"+cmd_string)
+
+
 def call_bigclam(graph_fname, time_stamp, n_clusters):
     #png_filename = self.pipeline.output_dir+"images/"+plot_name+".png"
 
     print "Running BIGCLAM"
     #TODO: This is a bit messy refactor when possible
     output_prefix = "results/"+time_stamp+"/string_"+str(n_clusters)+"_communities/"+str(n_clusters)+"_"
-    command_list = ["bigclam", "-i:"+graph_fname, "-c:"+str(n_clusters), "-o:"+output_prefix, "-nt:8"]
+    command_list = ["bigclam", "-i:"+graph_fname, "-c:"+str(n_clusters), "-nt:8"]
     cmd_string = subprocess.list2cmdline(command_list)
     
     return_value = subprocess.call(command_list)#, stdout=png_file)
@@ -359,6 +370,8 @@ def call_bigclam(graph_fname, time_stamp, n_clusters):
         raise Exception("call_bigclam() failed with output: "+output_string) # command:"+cmd_string)
     
     output_filename = output_prefix+"cmtyvv.txt"
+    move_file("cmtyvv.txt", output_filename)
+    
     return output_filename
 
 def reformat_communities(in_fname, out_fname):
