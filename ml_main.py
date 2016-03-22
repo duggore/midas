@@ -351,7 +351,7 @@ def move_file(from_filename, to_filename):
 
     if return_value !=0:
         output_string = subprocess.check_output(command_list)
-        raise Exception("move_file() failed with output: "+output_string) # command:"+cmd_string)
+        raise Exception("move_file() failed with output: "+output_string)
 
 
 def call_bigclam(graph_fname, time_stamp, n_clusters):
@@ -359,7 +359,8 @@ def call_bigclam(graph_fname, time_stamp, n_clusters):
 
     print "Running BIGCLAM"
     #TODO: This is a bit messy refactor when possible
-    output_prefix = "results/"+time_stamp+"/string_"+str(n_clusters)+"_communities/"+str(n_clusters)+"_"
+    output_folder = "results/"+time_stamp+"/string_"+str(n_clusters)+"_communities/"
+    output_prefix = str(n_clusters)+"_"
     command_list = ["bigclam", "-i:"+graph_fname, "-c:"+str(n_clusters), "-nt:8"]
     cmd_string = subprocess.list2cmdline(command_list)
     
@@ -367,9 +368,14 @@ def call_bigclam(graph_fname, time_stamp, n_clusters):
 
     if return_value !=0:
         output_string = subprocess.check_output(command_list)
-        raise Exception("call_bigclam() failed with output: "+output_string) # command:"+cmd_string)
+        raise Exception("call_bigclam() failed with output: "+output_string)
     
-    output_filename = output_prefix+"cmtyvv.txt"
+    # Create the folder to put the results in
+    fname = os.path.dirname(os.path.abspath(__file__))+"/"+output_folder
+    os.makedirs(fname)
+    
+    #Move the file from the default output name to the name with the number of clusters to prevent overwriting
+    output_filename = output_folder+output_prefix+"cmtyvv.txt"
     move_file("cmtyvv.txt", output_filename)
     
     return output_filename
