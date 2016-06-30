@@ -3,7 +3,7 @@ try:
 except ImportError:
     raise ImportError("Please install biosuite: https://github.com/OliverPalmer/biosuite")
 
-check_dependencies()
+#check_dependencies()
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,7 +19,7 @@ from biosuite import BioSession
 from biosuite.machine_learning import MLController, Classifier
 from biosuite.helper_functions import inform, warn, get_date_time
 from biosuite.pipeline import Pipeline, Operation
-from biosuite.protein import Protein
+from biosuite.gene import Gene
 
 from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier
@@ -43,7 +43,7 @@ class AddGenesToSession(Operation):
             if gene_id in encountered_dict:
                 continue
             encountered_dict[gene_id] = True
-            protein = Protein(gene_id)
+            protein = Gene(gene_id)
             self.pipeline.biosession.add_protein(protein)
             added += 1
         print "Added {} genes to session".format(added)
@@ -311,13 +311,21 @@ class GraphClusterPipeline(Pipeline):
         self.add_resource("random_seed", 0)
         random.seed(self.random_seed)
         
-        # Was used when running MIDAS on Barabasi's network which needed NCBI ids not ENSP ids
-        #self.add_resource("train_positives_fname", "../mito_disease_genes_as_ncbi_ids_for_barabasi.txt")
+        training_pos_folder = "resources/training_data/training_positives/"
+        
+        # Hereditary motor neurone disease
+        #self.add_resource("train_positives_fname", training_pos_folder+"hmn_disease_genes/hmn_gene_list_as_ensps.txt")
         
         # The Washington University mitochondrial disease genes list
-        #self.add_resource("train_positives_fname", "/wash_u/wash_u_extras_ensps.txt")
+        self.add_resource("train_positives_fname", training_pos_folder+"mito_disease_genes/wash_u/wash_u_extras_ensps.txt")
         
-        self.add_resource("train_positives_fname", "resources/training_data/training_positives/impi_training_positive/training_positives_as_ensps.txt")
+        # IMPI training positives 
+        #self.add_resource("train_positives_fname", training_pos_folder+"impi_training_positive/training_positives_as_ensps.txt")
+        
+        # DEPRECIATED Was used when running MIDAS on Barabasi's network which needed NCBI ids not ENSP ids
+        #self.add_resource("train_positives_fname", training_pos_folder+"/mito_disease_genes_as_ncbi_ids_for_barabasi.txt")
+        
+        
         ##################################################
         #Add operations to the pipeline
         ##################################################
